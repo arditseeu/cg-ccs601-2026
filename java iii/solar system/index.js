@@ -27,18 +27,33 @@ const earthMesh = new THREE.Mesh(earthGeometry, earthMaterial);
 earthMesh.position.x = 2;
 earthOrbit.add(earthMesh);
 
+//Hena
 const moonGeometry = new THREE.SphereGeometry(0.1, 32, 32);
 const moonMaterial = new THREE.MeshStandardMaterial({ color: 0x888888 });
 const moonMesh = new THREE.Mesh(moonGeometry, moonMaterial);
 moonMesh.position.x = 0.7;
-
-
-earthOrbit.add(moonMesh);
 earthMesh.add(moonMesh);
 
 scene.add(earthOrbit);
 
-camera.position.z = 3;
+const marsOrbit = new THREE.Object3D();
+//Marsi
+const marsGeometry = new THREE.SphereGeometry(0.3, 32, 32);
+const marsMaterial = new THREE.MeshStandardMaterial({ color: 0xcc3300, wireframe: true });
+const marsMesh = new THREE.Mesh(marsGeometry, marsMaterial);
+marsMesh.position.x = 3.5;
+marsOrbit.add(marsMesh);
+
+//Phobos
+const phobosGeometry = new THREE.SphereGeometry(0.06, 16, 16);
+const phobosMaterial = new THREE.MeshStandardMaterial({ color: 0xaaaaaa });
+const phobosMesh = new THREE.Mesh(phobosGeometry, phobosMaterial);
+phobosMesh.position.x = 0.5;
+marsMesh.add(phobosMesh);
+
+scene.add(marsOrbit);
+
+camera.position.set(0, 4, 8);
 
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -48,10 +63,12 @@ const controls = new OrbitControls(camera, renderer.domElement);
 
 function animate() {
     requestAnimationFrame(animate);
-      controls.update();
+    controls.update();
     sunMesh.rotation.y += 0.01;
     earthOrbit.rotation.y += 0.01;
     earthMesh.rotation.y += 0.02;
+    marsOrbit.rotation.y += 0.005;
+    marsMesh.rotation.y += 0.04;
     renderer.render(scene, camera);
 }
 animate();
