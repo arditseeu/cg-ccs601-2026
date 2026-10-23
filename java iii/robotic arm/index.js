@@ -74,28 +74,36 @@ palm.position.y = 0.9;
 wrist.add(palm);
 
 
+// Gishtat: secili ka madhesi te vet. Gishti i madh eshte ne anen e majte te shputes.
+const fingerData = [
+    { name: 'thumb',  width: 0.3,  length: 0.8,  x: -0.9, y: -0.1, tilt: 70 },
+    { name: 'index',  width: 0.22, length: 1.0,  x: -0.6, y: 0.75, tilt: 0 },
+    { name: 'middle', width: 0.24, length: 1.25, x: -0.2, y: 0.75, tilt: 0 },
+    { name: 'ring',   width: 0.22, length: 1.05, x: 0.2,  y: 0.75, tilt: 0 },
+    { name: 'pinky',  width: 0.18, length: 0.75, x: 0.6,  y: 0.75, tilt: 0 }
+];
+
 const fingers = [];
 
-const fingerGeometry = new THREE.BoxGeometry(0.25, 1, 0.25);
+fingerData.forEach(function(data) {
 
-for (let i = 0; i < 5; i++) {
+    const pivot = new THREE.Group();
+    pivot.position.set(data.x, data.y, 0);
+    pivot.rotation.z = THREE.MathUtils.degToRad(data.tilt);
+    palm.add(pivot);
 
     const fingerJoint = new THREE.Group();
+    pivot.add(fingerJoint);
 
-    fingerJoint.position.x = -0.7 + i * 0.35;
-    fingerJoint.position.y = 0.75;
-
-    palm.add(fingerJoint);
-
-
-    const finger = new THREE.Mesh(fingerGeometry, fingerMaterial);
-
-
-    finger.position.y = 0.5;
+    const finger = new THREE.Mesh(
+        new THREE.BoxGeometry(data.width, data.length, data.width),
+        fingerMaterial
+    );
+    finger.position.y = data.length / 2;
     fingerJoint.add(finger);
 
     fingers.push(fingerJoint);
-}
+});
 
 
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
@@ -158,6 +166,9 @@ elbow.rotation.z = THREE.MathUtils.degToRad(40);
 wrist.rotation.z = THREE.MathUtils.degToRad(-20);
 
 const rotationStep = THREE.MathUtils.degToRad(5);
+const fingerStep = THREE.MathUtils.degToRad(5);
+const maxCurl = THREE.MathUtils.degToRad(90);
+let selectedFingers = [0, 1, 2, 3, 4];
 
 window.addEventListener('keydown', function(event) {
 
@@ -185,6 +196,25 @@ window.addEventListener('keydown', function(event) {
 
     if (key === 'd') {
         wrist.rotation.z -= rotationStep;
+    }
+        if (['1', '2', '3', '4', '5'].includes(key)) {
+        selectedFingers = [Number(key) - 1];
+    }
+
+    if (key === '6') {
+        selectedFingers = [0, 1, 2, 3, 4];
+    }
+
+    if (key === 'arrowup') {
+        selectedFingers.forEach(function(i) {
+            fingers[i].rotation.x = Math.min(fingers[i].rotation.x + fingerStep, maxCurl);
+        });
+    }
+
+    if (key === 'arrowdown') {
+        selectedFingers.forEach(function(i) {
+            fingers[i].rotation.x = Math.max(fingers[i].rotation.x - fingerStep, 0);
+        });
     }
 
 });
